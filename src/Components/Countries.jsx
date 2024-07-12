@@ -3,6 +3,7 @@ import { ThemeContext } from "./Layout";
 import styled from "styled-components";
 import { useAPI } from "../Hooks/useAPI";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 //always required fields: name, flag; the rest are optional
 const fieldArray = [
@@ -18,14 +19,18 @@ const fieldArray = [
 export const Countries = () => {
   const theme = useContext(ThemeContext);
   const url = "https://restcountries.com/v2/all?fields=" + fieldArray.join(",");
-  const [{ data, isLoading, isError }] = useAPI(url);
   const [query, setQuery] = useState("");
 
-  return isLoading ? (
-    <div>Loading...</div>
-  ) : isError ? (
-    <div>Something went wrong...</div>
-  ) : (
+  const { isPending, error, data } = useQuery({
+    queryKey: ["all_countries"],
+    queryFn: () => fetch(url).then((res) => res.json()),
+  });
+
+  if (isPending) return "Loading...";
+
+  if (error) return "An error has occurred: " + error.message;
+
+  return (
     <>
       <SearchInput
         type="search"
