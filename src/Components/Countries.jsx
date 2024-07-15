@@ -24,6 +24,7 @@ export const Countries = () => {
   const { isPending, error, data } = useQuery({
     queryKey: ["all_countries"],
     queryFn: () => fetch(url).then((res) => res.json()),
+    staleTime: Infinity,
   });
 
   if (isPending) return "Loading...";

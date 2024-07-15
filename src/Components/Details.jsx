@@ -17,6 +17,7 @@ export const Details = () => {
   const { isPending, error, data } = useQuery({
     queryKey: [country],
     queryFn: () => fetch(url).then((res) => res.json()),
+    staleTime: Infinity,
   });
 
   if (isPending) return "Loading...";
