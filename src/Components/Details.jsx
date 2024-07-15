@@ -3,6 +3,7 @@ import { useAPI } from "../Hooks/useAPI";
 import styled from "styled-components";
 import { useContext } from "react";
 import { ThemeContext } from "./Layout";
+import { useQuery } from "@tanstack/react-query";
 
 export const Details = () => {
   const navigate = useNavigate();
@@ -12,15 +13,20 @@ export const Details = () => {
 
   let { country } = useParams();
   const url = `https://restcountries.com/v2/name/${country}?fields=name,capital,region,subregion,borders,flag&fullText=true`;
-  const [{ data, isLoading, isError }] = useAPI(url);
+
+  const { isPending, error, data } = useQuery({
+    queryKey: [country],
+    queryFn: () => fetch(url).then((res) => res.json()),
+    staleTime: Infinity,
+  });
+
+  if (isPending) return "Loading...";
+
+  if (error) return "An error has occurred: " + error.message;
 
   const { name, capital, region, subregion, flag, borders } = { ...data[0] };
 
-  return isLoading ? (
-    <div>Loading...</div>
-  ) : isError ? (
-    <div>Something went wrong...</div>
-  ) : (
+  return (
     <>
       <ButtonBack onClick={goBack}>Back</ButtonBack>
       <Item>
